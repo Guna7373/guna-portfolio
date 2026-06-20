@@ -76,14 +76,14 @@ const Icons = {
 
 const data = {
   name: "S. Eniya Gunalan",
-  role: "Web Developer",
+  role: "Fullstock Developer",
   company: "Foresight Technologies",
   email: "gunaeniyan1@gmail.com",
   phone: "+91 7339323675",
   dob: "11 October 2002",
   languages: "Tamil, English",
   summary:
-    "Passionate Web Developer with 2.5 years of professional experience and 6 months of internship building dynamic web applications. Specializing in PHP (Core & CodeIgniter 3/4), with solid frontend skills in HTML, CSS, Tailwind, and JavaScript. Experienced in RESTful API integration, MySQL, and creating mobile-responsive web pages wrapped as hybrid Android apps.",
+    "Passionate Fullstock Developer with 2.5 years of professional experience and 6 months of internship building dynamic web applications. Specializing in PHP (Core & CodeIgniter 3/4), with solid frontend skills in HTML, CSS, Tailwind, and JavaScript. Experienced in RESTful API integration, MySQL, and creating mobile-responsive web pages wrapped as hybrid Android apps.",
   education: [
     {
       degree: "Bachelor of Science (B.Sc. IT)",
@@ -123,7 +123,7 @@ const data = {
   ],
   experience: [
     {
-      role: "Web Developer",
+      role: "Fullstock Developer",
       company: "Foresight Technologies",
       duration: "Jan 2024 – Present · 2 Years 5 Months",
       points: [
@@ -842,7 +842,7 @@ class Auth extends ResourceController {
             <h1>
               <span style={{ fontSize: "clamp(1.2rem,3vw,1.8rem)", fontWeight: 600, color: "var(--muted)", display: "block", marginBottom: "0.5rem" }}>Hi, I'm</span>
               Eniya Gunalan<br />
-              <span className="highlight">Web Developer</span>
+              <span className="highlight">Fullstock Developer</span>
             </h1>
             <p className="hero-sub">
               2.5 years of professional experience & 6 months of internship building high-performing backend systems using <strong style={{ color: "var(--text)" }}>PHP, CodeIgniter & MySQL</strong>. Wrapping mobile-ready applications as hybrid Android apps at Foresight Technologies.
@@ -1058,7 +1058,7 @@ class Auth extends ResourceController {
             <div className="contact-box">
               <div className="contact-title">Start a Conversation</div>
               <p className="contact-p">
-                I'm currently open to freelance opportunities, professional web developer positions, and team collaborations. 
+                I'm currently open to freelance opportunities, professional Fullstock developer positions, and team collaborations. 
                 Click below to copy my contact information.
               </p>
               
