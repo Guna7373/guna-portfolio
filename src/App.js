@@ -724,7 +724,7 @@ class Auth extends ResourceController {
       }
     }, 15);
     return () => clearInterval(interval);
-  }, []);
+  }, [codeSnippet]);
 
   // Update scroll progress bar
   useEffect(() => {
