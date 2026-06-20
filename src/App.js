@@ -118,7 +118,7 @@ const data = {
     {
       category: "Mobile & Other",
       icon: "mobile",
-      items: ["Android Hybrid App", "Mobile-Responsive Pages", "Python (Basic)", "Git", "XAMPP", "Postman"],
+      items: ["Android Hybrid App", "Mobile-Responsive Pages", "Git", "XAMPP", "Postman"],
     },
   ],
   experience: [
@@ -174,7 +174,7 @@ const data = {
       icon: "android",
       title: "Hybrid Android App",
       desc: "Converted a mobile-responsive web page into an Android application using a single Java file with WebView — enabling app-like experience on Android devices.",
-      stack: ["Android", "Java", "WebView", "HTML", "CSS"],
+      stack: ["Android", "Java(Basic)", "WebView", "HTML", "CSS"],
       type: "Professional",
     },
   ],
