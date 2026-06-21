@@ -76,14 +76,14 @@ const Icons = {
 
 const data = {
   name: "S. Eniya Gunalan",
-  role: "Fullstock Developer",
+  role: "Full Stack Developer",
   company: "Foresight Technologies",
   email: "gunaeniyan1@gmail.com",
   phone: "+91 7339323675",
   dob: "11 October 2002",
   languages: "Tamil, English",
   summary:
-    "Passionate Fullstock Developer with 2.5 years of professional experience and 6 months of internship building dynamic web applications and enterprise systems. Specializing in PHP (Core & CodeIgniter 3/4), VB.NET, and secure backend solutions. Experienced in logistics truckload planning, IMPS payment workflows, Aadhaar KYC authorization, billing and finance software, RESTful API integration, MySQL, and responsive React websites.",
+    "Passionate Full Stack Developer with 2.5 years of professional experience and 6 months of internship building dynamic web applications and enterprise systems. Specializing in PHP (Core & CodeIgniter 3/4), VB.NET, and secure backend solutions. Experienced in logistics truckload planning, IMPS payment workflows, Aadhaar KYC authorization, billing and finance software, RESTful API integration, MySQL, and responsive React websites.",
   education: [
     {
       degree: "Bachelor of Science (B.Sc. IT)",
@@ -123,7 +123,7 @@ const data = {
   ],
   experience: [
     {
-      role: "Fullstock Developer",
+      role: "Full Stack Developer",
       company: "Foresight Technologies",
       duration: "Jan 2024 – Present · 2 Years 5 Months",
       points: [
@@ -1621,7 +1621,7 @@ class Auth extends ResourceController {
             <h1 className="hero-rise" style={{ animationDelay: "0.18s" }}>
               <span style={{ fontSize: "clamp(1.2rem,3vw,1.8rem)", fontWeight: 600, color: "var(--muted)", display: "block", marginBottom: "0.5rem" }}>Hi, I'm</span>
               Eniya Gunalan<br />
-              <span className="highlight">Fullstock Developer</span>
+              <span className="highlight">Full Stack Developer</span>
             </h1>
             <p className="hero-sub hero-rise" style={{ animationDelay: "0.32s" }}>
               2.5 years of professional experience & 6 months of internship building high-performing backend systems using <strong style={{ color: "var(--text)" }}>PHP, CodeIgniter & MySQL</strong>. Wrapping mobile-ready applications as hybrid Android apps at Foresight Technologies.
@@ -1857,7 +1857,7 @@ class Auth extends ResourceController {
             <div className="contact-box">
               <div className="contact-title">Start a Conversation</div>
               <p className="contact-p">
-                I'm currently open to freelance opportunities, professional Fullstock developer positions, and team collaborations. 
+                I'm currently open to freelance opportunities, professional Full Stack Developer positions, and team collaborations. 
                 Click below to copy my contact information.
               </p>
               
