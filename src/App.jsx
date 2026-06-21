@@ -1008,6 +1008,43 @@ const style = `
     .stats-grid { grid-template-columns: 1fr; }
     .edu-card { flex-direction: column; text-align: center; }
     .edu-right { text-align: center; }
+
+    .scroll-progress,
+    .ambient-glows,
+    .cursor-dot,
+    .cursor-ring,
+    .cursor-trail {
+      display: none !important;
+    }
+    .spotlight-card,
+    .proj-card,
+    .exp-card,
+    .skill-card,
+    .hero-cta .btn,
+    .info-row,
+    .c-link,
+    .chip {
+      transition: none !important;
+      animation: none !important;
+      transform: none !important;
+    }
+    .pills .pill {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .section,
+    .hero-grid,
+    .about-grid,
+    .stats-grid,
+    .exp-timeline,
+    .proj-grid {
+      scroll-behavior: auto !important;
+    }
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 
   /* RESPECT REDUCED MOTION */
@@ -1097,6 +1134,7 @@ export default function Portfolio() {
   const [timelineProgress, setTimelineProgress] = useState(0);
   const [navIndicator, setNavIndicator] = useState({ left: 0, width: 0, opacity: 0 });
   const [bgOffset, setBgOffset] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   const navLinksRef = useRef(null);
   const statsRef = useRef(null);
@@ -1133,22 +1171,41 @@ class Auth extends ResourceController {
     return () => clearInterval(interval);
   }, [codeSnippet]);
 
+  useEffect(() => {
+    const updateMobile = () => {
+      const isTouch = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+      setIsMobile(isTouch || window.innerWidth <= 768);
+    };
+    updateMobile();
+    window.addEventListener('resize', updateMobile);
+    return () => window.removeEventListener('resize', updateMobile);
+  }, []);
+
   // Update scroll progress bar (and a subtle ambient-background parallax)
   useEffect(() => {
     const handleScroll = () => {
+      if (isMobile) {
+        setScrollProgress(0);
+        setBgOffset(0);
+        return;
+      }
       const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
       if (totalScroll > 0) {
         setScrollProgress((window.pageYOffset / totalScroll) * 100);
       }
       setBgOffset(Math.max(window.pageYOffset * -0.05, -240));
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isMobile]);
 
   // Reveal elements on scroll (section bodies fade up, headers get a curtain wipe)
   useEffect(() => {
+    if (isMobile) {
+      document.querySelectorAll('.fu, .reveal-mask').forEach((el) => el.classList.add('vis'));
+      return;
+    }
     const obs = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -1169,11 +1226,15 @@ class Auth extends ResourceController {
       obs.observe(el);
     });
     return () => obs.disconnect();
-  }, []);
+  }, [isMobile]);
 
   // Cascading reveal for grid items (skills, education, experience, projects)
   useEffect(() => {
     const items = Array.from(document.querySelectorAll('.stagger-item'));
+    if (isMobile) {
+      items.forEach((el) => el.classList.add('stagger-vis'));
+      return;
+    }
     // delay computed relative to position among its own siblings, so each
     // section cascades independently instead of compounding page-wide
     const groups = new Map();
@@ -1196,7 +1257,7 @@ class Auth extends ResourceController {
     );
     items.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, []);
+  }, [isMobile]);
 
   // Trigger the stat counters once when scrolled into view
   useEffect(() => {
@@ -1220,6 +1281,10 @@ class Auth extends ResourceController {
   // Scroll-linked fill for the experience timeline
   useEffect(() => {
     const handle = () => {
+      if (isMobile) {
+        setTimelineProgress(0.75);
+        return;
+      }
       const el = timelineRef.current;
       if (!el) return;
       const rect = el.getBoundingClientRect();
@@ -1236,7 +1301,7 @@ class Auth extends ResourceController {
       window.removeEventListener('scroll', handle);
       window.removeEventListener('resize', handle);
     };
-  }, []);
+  }, [isMobile]);
 
   // Sliding nav indicator that tracks the active section button
   useEffect(() => {
@@ -1291,6 +1356,7 @@ class Auth extends ResourceController {
 
   // Custom cursor: dot + trailing ring + trailing dots with hover/click interactions
   useEffect(() => {
+    if (isMobile) return;
     // No real pointer on touch devices — skip entirely rather than leaving
     // the dot/ring frozen at their initial position on screen.
     if (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
@@ -1394,6 +1460,7 @@ class Auth extends ResourceController {
 
   // Spotlight card mouse tracking
   const handleMouseMove = (e) => {
+    if (isMobile) return;
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -1404,6 +1471,7 @@ class Auth extends ResourceController {
 
   // Project cards get a subtle 3D tilt in addition to the spotlight glow
   const handleProjectTilt = (e) => {
+    if (isMobile) return;
     handleMouseMove(e);
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
@@ -1414,11 +1482,13 @@ class Auth extends ResourceController {
     card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
   };
   const resetProjectTilt = (e) => {
+    if (isMobile) return;
     e.currentTarget.style.transform = "";
   };
 
   // Magnetic pull for the hero CTAs
   const handleMagnetic = (e) => {
+    if (isMobile) return;
     const btn = e.currentTarget;
     const rect = btn.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
@@ -1426,6 +1496,7 @@ class Auth extends ResourceController {
     btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
   };
   const resetMagnetic = (e) => {
+    if (isMobile) return;
     e.currentTarget.style.transform = "translate(0,0)";
   };
 
