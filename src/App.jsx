@@ -214,6 +214,8 @@ const style = `
     font-family: 'Outfit', sans-serif;
     overflow-x: hidden;
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   ::-webkit-scrollbar { width: 6px; }
@@ -222,6 +224,7 @@ const style = `
   .portfolio-root { 
     min-height: 100vh; 
     position: relative;
+    will-change: scroll-position;
   }
 
   /* SCROLL PROGRESS BAR */
@@ -231,6 +234,8 @@ const style = `
     z-index: 999; width: 0%;
     transition: width 0.1s ease-out;
     box-shadow: 0 0 20px rgba(14, 165, 233, 0.25);
+    will-change: width;
+    transform: translate3d(0, 0, 0);
   }
   .scroll-progress::after {
     content: '';
@@ -245,6 +250,8 @@ const style = `
   .ambient-glows {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     pointer-events: none; z-index: -1; overflow: hidden;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
   }
   .glow-orb {
     position: absolute; border-radius: 50%;
@@ -380,6 +387,8 @@ const style = `
     box-shadow: 0 8px 30px rgba(15, 23, 42, 0.02);
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.3s ease, box-shadow 0.3s ease, background 0.4s ease;
     animation: panelFloat 1.1s ease-out both;
+    will-change: transform, box-shadow;
+    transform: translate3d(0, 0, 0);
   }
   .spotlight-card:hover {
     transform: translateY(-8px) scale(1.02);
@@ -1013,9 +1022,13 @@ const style = `
     .ambient-glows,
     .cursor-dot,
     .cursor-ring,
-    .cursor-trail {
+    .cursor-trail,
+    .section-header::after,
+    .nav-indicator,
+    .hero-cta .btn::after {
       display: none !important;
     }
+
     .spotlight-card,
     .proj-card,
     .exp-card,
@@ -1026,24 +1039,24 @@ const style = `
     .chip {
       transition: none !important;
       animation: none !important;
-      transform: none !important;
     }
+
+    .spotlight-card:hover,
+    .proj-card:hover,
+    .c-link:hover {
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
     .pills .pill {
       animation: none !important;
       opacity: 1 !important;
       transform: none !important;
     }
-    .section,
-    .hero-grid,
-    .about-grid,
-    .stats-grid,
-    .exp-timeline,
-    .proj-grid {
+
+    body {
       scroll-behavior: auto !important;
-    }
-    *, *::before, *::after {
-      animation: none !important;
-      transition: none !important;
+      overscroll-behavior: contain;
     }
   }
 
@@ -1139,6 +1152,7 @@ export default function Portfolio() {
   const navLinksRef = useRef(null);
   const statsRef = useRef(null);
   const timelineRef = useRef(null);
+  const rafIdRef = useRef(null);
 
   const codeSnippet = `<?php
 namespace App\\Controllers;
@@ -1181,23 +1195,28 @@ class Auth extends ResourceController {
     return () => window.removeEventListener('resize', updateMobile);
   }, []);
 
-  // Update scroll progress bar (and a subtle ambient-background parallax)
+  // Update scroll progress bar (and a subtle ambient-background parallax) — throttled with RAF
   useEffect(() => {
-    const handleScroll = () => {
-      if (isMobile) {
-        setScrollProgress(0);
-        setBgOffset(0);
-        return;
-      }
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        setScrollProgress((window.pageYOffset / totalScroll) * 100);
-      }
-      setBgOffset(Math.max(window.pageYOffset * -0.05, -240));
+    if (isMobile) return;
+    
+    const onScroll = () => {
+      if (rafIdRef.current) return; // Already scheduled
+      rafIdRef.current = requestAnimationFrame(() => {
+        const scrollY = window.pageYOffset;
+        const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+        if (totalScroll > 0) {
+          setScrollProgress((scrollY / totalScroll) * 100);
+        }
+        setBgOffset(Math.max(scrollY * -0.05, -240));
+        rafIdRef.current = null;
+      });
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
   }, [isMobile]);
 
   // Reveal elements on scroll (section bodies fade up, headers get a curtain wipe)
@@ -1278,28 +1297,40 @@ class Auth extends ResourceController {
     return () => obs.disconnect();
   }, []);
 
-  // Scroll-linked fill for the experience timeline
+  // Scroll-linked fill for the experience timeline — throttled with RAF
   useEffect(() => {
+    if (isMobile) {
+      setTimelineProgress(0.75);
+      return;
+    }
+    
+    let rafTimelineId = null;
+    
     const handle = () => {
-      if (isMobile) {
-        setTimelineProgress(0.75);
-        return;
-      }
-      const el = timelineRef.current;
-      if (!el) return;
-      const rect = el.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const total = rect.height + vh * 0.5;
-      const traveled = vh * 0.8 - rect.top;
-      const pct = Math.min(1, Math.max(0, traveled / total));
-      setTimelineProgress(pct);
+      if (rafTimelineId) return;
+      rafTimelineId = requestAnimationFrame(() => {
+        const el = timelineRef.current;
+        if (!el) {
+          rafTimelineId = null;
+          return;
+        }
+        const rect = el.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const total = rect.height + vh * 0.5;
+        const traveled = vh * 0.8 - rect.top;
+        const pct = Math.min(1, Math.max(0, traveled / total));
+        setTimelineProgress(pct);
+        rafTimelineId = null;
+      });
     };
+    
     window.addEventListener('scroll', handle, { passive: true });
     window.addEventListener('resize', handle);
     handle();
     return () => {
       window.removeEventListener('scroll', handle);
       window.removeEventListener('resize', handle);
+      if (rafTimelineId) cancelAnimationFrame(rafTimelineId);
     };
   }, [isMobile]);
 
@@ -1458,15 +1489,21 @@ class Auth extends ResourceController {
     };
   }, []);
 
-  // Spotlight card mouse tracking
+  // Spotlight card mouse tracking — throttled
+  const lastCardMoveRef = useRef({ x: 0, y: 0 });
   const handleMouseMove = (e) => {
     if (isMobile) return;
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    card.style.setProperty("--mouse-x", `${x}px`);
-    card.style.setProperty("--mouse-y", `${y}px`);
+    
+    // Only update if moved significantly to reduce reflows
+    if (Math.abs(x - lastCardMoveRef.current.x) > 2 || Math.abs(y - lastCardMoveRef.current.y) > 2) {
+      lastCardMoveRef.current = { x, y };
+      card.style.setProperty("--mouse-x", `${x}px`);
+      card.style.setProperty("--mouse-y", `${y}px`);
+    }
   };
 
   // Project cards get a subtle 3D tilt in addition to the spotlight glow
